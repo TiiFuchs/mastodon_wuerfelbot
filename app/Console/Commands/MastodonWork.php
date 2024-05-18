@@ -6,6 +6,7 @@ use App\Facades\MastodonAPI;
 use App\Http\Integrations\Mastodon\Data\Notification\Notification;
 use App\Jobs\ParseNotification;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class MastodonWork extends Command
 {
@@ -15,8 +16,20 @@ class MastodonWork extends Command
 
     protected ?string $eventType = null;
 
-    public function handle(): void
+    protected function getTimestamptOfLastRestart(): ?int
     {
+        return Cache::get('mastodon:worker:restart');
+    }
+
+    protected function shouldRestart(?int $lastRestart): bool
+    {
+        return $this->getTimestamptOfLastRestart() !== $lastRestart;
+    }
+
+    public function handle()
+    {
+        $lastRestart = $this->getTimestamptOfLastRestart();
+
         $response = MastodonApi::streaming()->userNotifications();
         $stream = $response->stream();
 
@@ -27,6 +40,10 @@ class MastodonWork extends Command
             if ($char === "\n") {
                 $this->parseLine($buffer);
                 $buffer = '';
+
+                if ($this->shouldRestart($lastRestart)) {
+                    return;
+                }
 
                 continue;
             }
