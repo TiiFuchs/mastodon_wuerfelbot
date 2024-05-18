@@ -2,7 +2,7 @@
 
 namespace App\Http\Integrations\Mastodon\Requests;
 
-use App\Http\Integrations\Mastodon\Data\Status;
+use App\Http\Integrations\Mastodon\Forms\StatusForm;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
@@ -18,7 +18,7 @@ class PostStatus extends Request implements HasBody
     protected Method $method = Method::POST;
 
     public function __construct(
-        protected Status $status,
+        protected StatusForm $status,
     ) {
     }
 
