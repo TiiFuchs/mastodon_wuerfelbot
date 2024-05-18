@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Facades\MastodonAPI;
+use App\Facades\MastodonApi;
 use App\Http\Integrations\Mastodon\Data\Notification\Notification;
 use App\Jobs\ParseNotification;
 use Illuminate\Console\Command;
